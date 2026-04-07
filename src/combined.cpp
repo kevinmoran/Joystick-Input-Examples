@@ -448,14 +448,14 @@ void updateDualshock4(JoystickState* state, BYTE rawData[], DWORD byteCount)
 	state->currentInputs[DS4InputR3]             = (float)(1 & (*(rawData + offset + 6) >> 7));
 	state->currentInputs[DS4InputPS]             = (float)(1 & (*(rawData + offset + 7) >> 0));
 	state->currentInputs[DS4InputTouchPadButton] = (float)(1 & (*(rawData + offset + 7) >> 1));
-	state->currentInputs[DS4InputLeftStickLeft]   = -(leftStickX /255.0f * 2 -1);
-	state->currentInputs[DS4InputLeftStickRight]  =  (leftStickX /255.0f * 2 -1);
-	state->currentInputs[DS4InputLeftStickUp]     = -(leftStickY /255.0f * 2 -1);
-	state->currentInputs[DS4InputLeftStickDown]   =  (leftStickY /255.0f * 2 -1);
-	state->currentInputs[DS4InputRightStickLeft]  = -(rightStickX/255.0f * 2 -1);
-	state->currentInputs[DS4InputRightStickRight] =  (rightStickX/255.0f * 2 -1);
-	state->currentInputs[DS4InputRightStickUp]    = -(rightStickY/255.0f * 2 -1);
-	state->currentInputs[DS4InputRightStickDown]  =  (rightStickY/255.0f * 2 -1);
+	state->currentInputs[DS4InputLeftStickLeft]   = max(-(leftStickX /255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputLeftStickRight]  = max( (leftStickX /255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputLeftStickUp]     = max(-(leftStickY /255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputLeftStickDown]   = max( (leftStickY /255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputRightStickLeft]  = max(-(rightStickX/255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputRightStickRight] = max( (rightStickX/255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputRightStickUp]    = max(-(rightStickY/255.0f * 2 -1), 0);
+	state->currentInputs[DS4InputRightStickDown]  = max( (rightStickY/255.0f * 2 -1), 0);
 	state->currentInputs[DS4InputL2] = leftTrigger /255.0f;
 	state->currentInputs[DS4InputR2] = rightTrigger/255.0f;
 	state->currentInputs[DS4InputDpadUp]    = (dpad==0 || dpad==1 || dpad==7)? 1.0f : 0.0f;
@@ -542,14 +542,14 @@ void updateDualsense(JoystickState* state, BYTE rawData[], DWORD byteCount)
 	}
 
 	unsigned int offset = (bluetooth ? 2 : 0);
-	state->currentInputs[DS5InputLeftStickLeft]   = -(rawData[1 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputLeftStickRight]  = +(rawData[1 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputLeftStickUp]     = -(rawData[2 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputLeftStickDown]   = +(rawData[2 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputRightStickLeft]  = -(rawData[3 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputRightStickRight] = +(rawData[3 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputRightStickUp]    = -(rawData[4 + offset] / 255.0f * 2 - 1);
-	state->currentInputs[DS5InputRightStickDown]  = +(rawData[4 + offset] / 255.0f * 2 - 1);
+	state->currentInputs[DS5InputLeftStickLeft]   = max(-(rawData[1 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputLeftStickRight]  = max(+(rawData[1 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputLeftStickUp]     = max(-(rawData[2 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputLeftStickDown]   = max(+(rawData[2 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputRightStickLeft]  = max(-(rawData[3 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputRightStickRight] = max(+(rawData[3 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputRightStickUp]    = max(-(rawData[4 + offset] / 255.0f * 2 - 1), 0);
+	state->currentInputs[DS5InputRightStickDown]  = max(+(rawData[4 + offset] / 255.0f * 2 - 1), 0);
 	state->currentInputs[DS5InputL2] = rawData[5 + offset] / 255.0f;
 	state->currentInputs[DS5InputR2] = rawData[6 + offset] / 255.0f;
 	int hat = rawData[8 + offset] & 0x0F;
@@ -638,8 +638,8 @@ void parseGenericController(JoystickState* out, BYTE rawData[], DWORD dataSize, 
 		unsigned int usage = valueCaps[i].Range.UsageMin;
 		if (usage >= 0x30 && usage <= 0x37) {
 			int axisIndex = usage-0x30;
-			out->currentInputs[GenericInputAxis0Positive+2*axisIndex] = normalizedValue;
-			out->currentInputs[GenericInputAxis0Negative+2*axisIndex] = -normalizedValue;
+			out->currentInputs[GenericInputAxis0Positive+2*axisIndex] = max( normalizedValue, 0);
+			out->currentInputs[GenericInputAxis0Negative+2*axisIndex] = max(-normalizedValue, 0);
 		}
 		if (usage == 0x39) {
 			LONG hat = value - valueCaps[i].LogicalMin;
@@ -841,14 +841,14 @@ void updateJoysticks(Joysticks* joysticks)
 			state->currentInputs[XboxInputStart]               = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_START)? 1.0f : 0.0f;
 			state->currentInputs[XboxInputLeftTrigger]         = xinput.Gamepad.bLeftTrigger  / 255.0f;
 			state->currentInputs[XboxInputRightTrigger]        = xinput.Gamepad.bRightTrigger / 255.0f;
-			state->currentInputs[XboxInputLeftStickLeft]       =-xinput.Gamepad.sThumbLX / 32767.0f;
-			state->currentInputs[XboxInputLeftStickRight]      = xinput.Gamepad.sThumbLX / 32767.0f;
-			state->currentInputs[XboxInputLeftStickUp]         = xinput.Gamepad.sThumbLY / 32767.0f;
-			state->currentInputs[XboxInputLeftStickDown]       =-xinput.Gamepad.sThumbLY / 32767.0f;
-			state->currentInputs[XboxInputRightStickLeft]      =-xinput.Gamepad.sThumbRX / 32767.0f;
-			state->currentInputs[XboxInputRightStickRight]     = xinput.Gamepad.sThumbRX / 32767.0f;
-			state->currentInputs[XboxInputRightStickUp]        = xinput.Gamepad.sThumbRY / 32767.0f;
-			state->currentInputs[XboxInputRightStickDown]      =-xinput.Gamepad.sThumbRY / 32767.0f;
+			state->currentInputs[XboxInputLeftStickLeft]       = max(-xinput.Gamepad.sThumbLX, 0);
+			state->currentInputs[XboxInputLeftStickRight]      = max( xinput.Gamepad.sThumbLX, 0);
+			state->currentInputs[XboxInputLeftStickUp]         = max( xinput.Gamepad.sThumbLY, 0);
+			state->currentInputs[XboxInputLeftStickDown]       = max(-xinput.Gamepad.sThumbLY, 0);
+			state->currentInputs[XboxInputRightStickLeft]      = max(-xinput.Gamepad.sThumbRX, 0);
+			state->currentInputs[XboxInputRightStickRight]     = max( xinput.Gamepad.sThumbRX, 0);
+			state->currentInputs[XboxInputRightStickUp]        = max( xinput.Gamepad.sThumbRY, 0);
+			state->currentInputs[XboxInputRightStickDown]      = max(-xinput.Gamepad.sThumbRY, 0);
 
 			XINPUT_VIBRATION vibration;
 			vibration.wLeftMotorSpeed  = (WORD)(state->lightRumble*0xFFFF);
@@ -857,14 +857,6 @@ void updateJoysticks(Joysticks* joysticks)
 		}
 		else {
 			state->connected = false;
-		}
-	}
-
-	// Clamp negative inputs to 0
-	for (unsigned int joystickIndex=0; joystickIndex<joysticks->count; ++joystickIndex) {
-		for (unsigned int inputIndex=0; inputIndex<JoystickState::inputCount; ++inputIndex) {
-			float* input = &joysticks->states[joystickIndex].currentInputs[inputIndex];
-			if (*input < 0) *input = 0;
 		}
 	}
 }
