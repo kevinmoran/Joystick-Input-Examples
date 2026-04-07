@@ -427,41 +427,43 @@ void updateDualshock4(JoystickState* state, BYTE rawData[], DWORD byteCount)
 	else if (byteCount != usbInputByteCount) {
 		return;
 	}
+	BYTE* inputData = rawData + offset;
 
-	unsigned char leftStickX   = *(rawData + offset + 1);
-	unsigned char leftStickY   = *(rawData + offset + 2);
-	unsigned char rightStickX  = *(rawData + offset + 3);
-	unsigned char rightStickY  = *(rawData + offset + 4);
-	unsigned char leftTrigger  = *(rawData + offset + 8);
-	unsigned char rightTrigger = *(rawData + offset + 9);
-	unsigned char dpad           = 0b1111 & *(rawData + offset + 5);
+	unsigned char leftStickX   = inputData[1];
+	unsigned char leftStickY   = inputData[2];
+	unsigned char rightStickX  = inputData[3];
+	unsigned char rightStickY  = inputData[4];
+	unsigned char leftTrigger  = inputData[8];
+	unsigned char rightTrigger = inputData[9];
+	unsigned char dpad         = inputData[5] & 0x0F;
 
-	state->currentInputs[DS4InputSquare]         = (float)(1 & (*(rawData + offset + 5) >> 4));
-	state->currentInputs[DS4InputX]              = (float)(1 & (*(rawData + offset + 5) >> 5));
-	state->currentInputs[DS4InputCircle]         = (float)(1 & (*(rawData + offset + 5) >> 6));
-	state->currentInputs[DS4InputTriangle]       = (float)(1 & (*(rawData + offset + 5) >> 7));
-	state->currentInputs[DS4InputL1]             = (float)(1 & (*(rawData + offset + 6) >> 0));
-	state->currentInputs[DS4InputR1]             = (float)(1 & (*(rawData + offset + 6) >> 1));
-	state->currentInputs[DS4InputShare]          = (float)(1 & (*(rawData + offset + 6) >> 4));
-	state->currentInputs[DS4InputOptions]        = (float)(1 & (*(rawData + offset + 6) >> 5));
-	state->currentInputs[DS4InputL3]             = (float)(1 & (*(rawData + offset + 6) >> 6));
-	state->currentInputs[DS4InputR3]             = (float)(1 & (*(rawData + offset + 6) >> 7));
-	state->currentInputs[DS4InputPS]             = (float)(1 & (*(rawData + offset + 7) >> 0));
-	state->currentInputs[DS4InputTouchPadButton] = (float)(1 & (*(rawData + offset + 7) >> 1));
-	state->currentInputs[DS4InputLeftStickLeft]   = max(-(leftStickX /255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputLeftStickRight]  = max( (leftStickX /255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputLeftStickUp]     = max(-(leftStickY /255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputLeftStickDown]   = max( (leftStickY /255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputRightStickLeft]  = max(-(rightStickX/255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputRightStickRight] = max( (rightStickX/255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputRightStickUp]    = max(-(rightStickY/255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputRightStickDown]  = max( (rightStickY/255.0f * 2 -1), 0);
-	state->currentInputs[DS4InputL2] = leftTrigger /255.0f;
-	state->currentInputs[DS4InputR2] = rightTrigger/255.0f;
-	state->currentInputs[DS4InputDpadUp]    = (dpad==0 || dpad==1 || dpad==7)? 1.0f : 0.0f;
-	state->currentInputs[DS4InputDpadRight] = (dpad==1 || dpad==2 || dpad==3)? 1.0f : 0.0f; 
-	state->currentInputs[DS4InputDpadDown]  = (dpad==3 || dpad==4 || dpad==5)? 1.0f : 0.0f; 
-	state->currentInputs[DS4InputDpadLeft]  = (dpad==5 || dpad==6 || dpad==7)? 1.0f : 0.0f;
+	float* currInputs = state->currentInputs;
+	currInputs[DS4InputSquare]         = (float)(1 & (inputData[5] >> 4));
+	currInputs[DS4InputX]              = (float)(1 & (inputData[5] >> 5));
+	currInputs[DS4InputCircle]         = (float)(1 & (inputData[5] >> 6));
+	currInputs[DS4InputTriangle]       = (float)(1 & (inputData[5] >> 7));
+	currInputs[DS4InputL1]             = (float)(1 & (inputData[6] >> 0));
+	currInputs[DS4InputR1]             = (float)(1 & (inputData[6] >> 1));
+	currInputs[DS4InputShare]          = (float)(1 & (inputData[6] >> 4));
+	currInputs[DS4InputOptions]        = (float)(1 & (inputData[6] >> 5));
+	currInputs[DS4InputL3]             = (float)(1 & (inputData[6] >> 6));
+	currInputs[DS4InputR3]             = (float)(1 & (inputData[6] >> 7));
+	currInputs[DS4InputPS]             = (float)(1 & (inputData[7] >> 0));
+	currInputs[DS4InputTouchPadButton] = (float)(1 & (inputData[7] >> 1));
+	currInputs[DS4InputLeftStickLeft]   = max(-(leftStickX /255.0f * 2 -1), 0);
+	currInputs[DS4InputLeftStickRight]  = max( (leftStickX /255.0f * 2 -1), 0);
+	currInputs[DS4InputLeftStickUp]     = max(-(leftStickY /255.0f * 2 -1), 0);
+	currInputs[DS4InputLeftStickDown]   = max( (leftStickY /255.0f * 2 -1), 0);
+	currInputs[DS4InputRightStickLeft]  = max(-(rightStickX/255.0f * 2 -1), 0);
+	currInputs[DS4InputRightStickRight] = max( (rightStickX/255.0f * 2 -1), 0);
+	currInputs[DS4InputRightStickUp]    = max(-(rightStickY/255.0f * 2 -1), 0);
+	currInputs[DS4InputRightStickDown]  = max( (rightStickY/255.0f * 2 -1), 0);
+	currInputs[DS4InputL2] = leftTrigger /255.0f;
+	currInputs[DS4InputR2] = rightTrigger/255.0f;
+	currInputs[DS4InputDpadUp]    = (dpad==0 || dpad==1 || dpad==7)? 1.0f : 0.0f;
+	currInputs[DS4InputDpadRight] = (dpad==1 || dpad==2 || dpad==3)? 1.0f : 0.0f; 
+	currInputs[DS4InputDpadDown]  = (dpad==3 || dpad==4 || dpad==5)? 1.0f : 0.0f; 
+	currInputs[DS4InputDpadLeft]  = (dpad==5 || dpad==6 || dpad==7)? 1.0f : 0.0f;
 	state->type = JoystickTypeDualshock4;
 
 	int headerSize = 0;
@@ -478,11 +480,13 @@ void updateDualshock4(JoystickState* state, BYTE rawData[], DWORD byteCount)
 		state->outputBuffer[3] = 0x07;
 		headerSize = 1;
 	}
-	state->outputBuffer[4 + offset + headerSize] = (BYTE)(state->lightRumble*0xFF);
-	state->outputBuffer[5 + offset + headerSize] = (BYTE)(state->heavyRumble*0xFF);
-	state->outputBuffer[6 + offset + headerSize] = (BYTE)(state->ledRed     *0xFF);
-	state->outputBuffer[7 + offset + headerSize] = (BYTE)(state->ledGreen   *0xFF);
-	state->outputBuffer[8 + offset + headerSize] = (BYTE)(state->ledBlue    *0xFF);
+	BYTE* outputData = state->outputBuffer + offset + headerSize;
+
+	outputData[4] = (BYTE)(state->lightRumble*0xFF);
+	outputData[5] = (BYTE)(state->heavyRumble*0xFF);
+	outputData[6] = (BYTE)(state->ledRed     *0xFF);
+	outputData[7] = (BYTE)(state->ledGreen   *0xFF);
+	outputData[8] = (BYTE)(state->ledBlue    *0xFF);
 
 	if (byteCount == bluetoothInputByteCount) {
 		uint32_t crc = makeReflectedCRC32(state->outputBuffer, 75);
@@ -542,34 +546,37 @@ void updateDualsense(JoystickState* state, BYTE rawData[], DWORD byteCount)
 	}
 
 	unsigned int offset = (bluetooth ? 2 : 0);
-	state->currentInputs[DS5InputLeftStickLeft]   = max(-(rawData[1 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputLeftStickRight]  = max(+(rawData[1 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputLeftStickUp]     = max(-(rawData[2 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputLeftStickDown]   = max(+(rawData[2 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputRightStickLeft]  = max(-(rawData[3 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputRightStickRight] = max(+(rawData[3 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputRightStickUp]    = max(-(rawData[4 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputRightStickDown]  = max(+(rawData[4 + offset] / 255.0f * 2 - 1), 0);
-	state->currentInputs[DS5InputL2] = rawData[5 + offset] / 255.0f;
-	state->currentInputs[DS5InputR2] = rawData[6 + offset] / 255.0f;
-	int hat = rawData[8 + offset] & 0x0F;
-	state->currentInputs[DS5InputDpadLeft]  = hat == 5 || hat == 6 || hat == 7;
-	state->currentInputs[DS5InputDpadRight] = hat == 1 || hat == 2 || hat == 3;
-	state->currentInputs[DS5InputDpadUp]    = hat == 7 || hat == 0 || hat == 1;
-	state->currentInputs[DS5InputDpadDown]  = hat == 3 || hat == 4 || hat == 5;
-	state->currentInputs[DS5InputSquare]           = (float)(rawData[8 +  offset] & 0x10);
-	state->currentInputs[DS5InputX]                = (float)(rawData[8 +  offset] & 0x20);
-	state->currentInputs[DS5InputCircle]           = (float)(rawData[8 +  offset] & 0x40);
-	state->currentInputs[DS5InputTriangle]         = (float)(rawData[8 +  offset] & 0x80);
-	state->currentInputs[DS5InputL1]               = (float)(rawData[9 +  offset] & 0x01);
-	state->currentInputs[DS5InputR1]               = (float)(rawData[9 +  offset] & 0x02);
-	state->currentInputs[DS5InputShare]            = (float)(rawData[9 +  offset] & 0x10);
-	state->currentInputs[DS5InputOptions]          = (float)(rawData[9 +  offset] & 0x20);
-	state->currentInputs[DS5InputL3]               = (float)(rawData[9 +  offset] & 0x40);
-	state->currentInputs[DS5InputR3]               = (float)(rawData[9 +  offset] & 0x80);
-	state->currentInputs[DS5InputPS]               = (float)(rawData[10 + offset] & 0x01);
-	state->currentInputs[DS5InputTouchPadButton]   = (float)(rawData[10 + offset] & 0x02);
-	state->currentInputs[DS5InputMicrophoneButton] = (float)(rawData[10 + offset] & 0x04);
+	BYTE* inputData = rawData + offset;
+
+	float* currInputs = state->currentInputs;
+	currInputs[DS5InputLeftStickLeft]   = max(-(inputData[1] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputLeftStickRight]  = max(+(inputData[1] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputLeftStickUp]     = max(-(inputData[2] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputLeftStickDown]   = max(+(inputData[2] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputRightStickLeft]  = max(-(inputData[3] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputRightStickRight] = max(+(inputData[3] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputRightStickUp]    = max(-(inputData[4] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputRightStickDown]  = max(+(inputData[4] / 255.0f * 2 - 1), 0);
+	currInputs[DS5InputL2] = inputData[5] / 255.0f;
+	currInputs[DS5InputR2] = inputData[6] / 255.0f;
+	int hat = inputData[8] & 0x0F;
+	currInputs[DS5InputDpadLeft]  = hat == 5 || hat == 6 || hat == 7;
+	currInputs[DS5InputDpadRight] = hat == 1 || hat == 2 || hat == 3;
+	currInputs[DS5InputDpadUp]    = hat == 7 || hat == 0 || hat == 1;
+	currInputs[DS5InputDpadDown]  = hat == 3 || hat == 4 || hat == 5;
+	currInputs[DS5InputSquare]           = (float)(inputData[8] & 0x10);
+	currInputs[DS5InputX]                = (float)(inputData[8] & 0x20);
+	currInputs[DS5InputCircle]           = (float)(inputData[8] & 0x40);
+	currInputs[DS5InputTriangle]         = (float)(inputData[8] & 0x80);
+	currInputs[DS5InputL1]               = (float)(inputData[9] & 0x01);
+	currInputs[DS5InputR1]               = (float)(inputData[9] & 0x02);
+	currInputs[DS5InputShare]            = (float)(inputData[9] & 0x10);
+	currInputs[DS5InputOptions]          = (float)(inputData[9] & 0x20);
+	currInputs[DS5InputL3]               = (float)(inputData[9] & 0x40);
+	currInputs[DS5InputR3]               = (float)(inputData[9] & 0x80);
+	currInputs[DS5InputPS]               = (float)(inputData[10] & 0x01);
+	currInputs[DS5InputTouchPadButton]   = (float)(inputData[10] & 0x02);
+	currInputs[DS5InputMicrophoneButton] = (float)(inputData[10] & 0x04);
 	state->type = JoystickTypeDualsense;
 
 	memset(state->outputBuffer, 0, sizeof(state->outputBuffer));
@@ -589,23 +596,24 @@ void updateDualsense(JoystickState* state, BYTE rawData[], DWORD byteCount)
 		outputByteCount = 48;
 		state->outputBuffer[0] = 0x02;
 	}
+	BYTE* outputData = state->outputBuffer + offset + headerSize;
 
 	// Enable rumble, disable audio haptics, enable right and left trigger effect
-	state->outputBuffer[0 + offset + headerSize] |= 0x0F;
+	outputData[0] |= 0x0F;
 	// Enable LED color
-	state->outputBuffer[1 + offset + headerSize] |= 0x04;
+	outputData[1] |= 0x04;
 	// Enable rumble low pass filter
-	state->outputBuffer[38 + offset + headerSize] |= 0x04;
+	outputData[38] |= 0x04;
 
-	state->outputBuffer[2 + offset + headerSize] = (BYTE)(state->lightRumble * 0xFF);
-	state->outputBuffer[3 + offset + headerSize] = (BYTE)(state->heavyRumble * 0xFF);
+	outputData[2] = (BYTE)(state->lightRumble * 0xFF);
+	outputData[3] = (BYTE)(state->heavyRumble * 0xFF);
 
-	setDualsenseTriggerEffect(state->outputBuffer + 10 + offset + headerSize, state->rightTriggerEffect);
-	setDualsenseTriggerEffect(state->outputBuffer + 21 + offset + headerSize, state->leftTriggerEffect);
+	setDualsenseTriggerEffect(outputData + 10, state->rightTriggerEffect);
+	setDualsenseTriggerEffect(outputData + 21, state->leftTriggerEffect);
 
-	state->outputBuffer[44 + offset + headerSize] = (BYTE)(state->ledRed   * 0xFF);
-	state->outputBuffer[45 + offset + headerSize] = (BYTE)(state->ledGreen * 0xFF);
-	state->outputBuffer[46 + offset + headerSize] = (BYTE)(state->ledBlue  * 0xFF);
+	outputData[44] = (BYTE)(state->ledRed   * 0xFF);
+	outputData[45] = (BYTE)(state->ledGreen * 0xFF);
+	outputData[46] = (BYTE)(state->ledBlue  * 0xFF);
 
 	if (bluetooth) {
 		uint32_t crc = makeReflectedCRC32(state->outputBuffer, 74);
@@ -809,7 +817,8 @@ Joysticks createJoysticks()
 void updateJoysticks(Joysticks* joysticks)
 {
 	for (unsigned int i=0; i<joysticks->count; ++i) {
-		memcpy(joysticks->states[i].previousInputs, joysticks->states[i].currentInputs, sizeof(joysticks->states[i].previousInputs));
+		JoystickState* state = &joysticks->states[i];
+		memcpy(state->previousInputs, state->currentInputs, sizeof(state->previousInputs));
 	}
 
 	// HID controllers
@@ -826,30 +835,33 @@ void updateJoysticks(Joysticks* joysticks)
 		JoystickState* state = &joysticks->states[playerIndex];
 		XINPUT_STATE xinput;
 		if (state->connected && XInputGetState(playerIndex, &xinput) == ERROR_SUCCESS) {
-			state->currentInputs[XboxInputA]                   = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_A)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputB]                   = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_B)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputX]                   = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_X)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputY]                   = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_Y)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputDpadLeft]            = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputDpadRight]           = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputDpadUp]              = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputDpadDown]            = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputLeftBumper]          = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputRightBumper]         = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputLeftStickButton]     = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputRightStickButton]    = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputBack]                = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputStart]               = (xinput.Gamepad.wButtons & XINPUT_GAMEPAD_START)? 1.0f : 0.0f;
-			state->currentInputs[XboxInputLeftTrigger]         = xinput.Gamepad.bLeftTrigger  / 255.0f;
-			state->currentInputs[XboxInputRightTrigger]        = xinput.Gamepad.bRightTrigger / 255.0f;
-			state->currentInputs[XboxInputLeftStickLeft]       = max(-xinput.Gamepad.sThumbLX, 0);
-			state->currentInputs[XboxInputLeftStickRight]      = max( xinput.Gamepad.sThumbLX, 0);
-			state->currentInputs[XboxInputLeftStickUp]         = max( xinput.Gamepad.sThumbLY, 0);
-			state->currentInputs[XboxInputLeftStickDown]       = max(-xinput.Gamepad.sThumbLY, 0);
-			state->currentInputs[XboxInputRightStickLeft]      = max(-xinput.Gamepad.sThumbRX, 0);
-			state->currentInputs[XboxInputRightStickRight]     = max( xinput.Gamepad.sThumbRX, 0);
-			state->currentInputs[XboxInputRightStickUp]        = max( xinput.Gamepad.sThumbRY, 0);
-			state->currentInputs[XboxInputRightStickDown]      = max(-xinput.Gamepad.sThumbRY, 0);
+			XINPUT_GAMEPAD* gamepad = &xinput.Gamepad;
+			WORD buttons = gamepad->wButtons;
+			float* currInputs = state->currentInputs;
+			currInputs[XboxInputA]                   = (buttons & XINPUT_GAMEPAD_A)? 1.0f : 0.0f;
+			currInputs[XboxInputB]                   = (buttons & XINPUT_GAMEPAD_B)? 1.0f : 0.0f;
+			currInputs[XboxInputX]                   = (buttons & XINPUT_GAMEPAD_X)? 1.0f : 0.0f;
+			currInputs[XboxInputY]                   = (buttons & XINPUT_GAMEPAD_Y)? 1.0f : 0.0f;
+			currInputs[XboxInputDpadLeft]            = (buttons & XINPUT_GAMEPAD_DPAD_LEFT)? 1.0f : 0.0f;
+			currInputs[XboxInputDpadRight]           = (buttons & XINPUT_GAMEPAD_DPAD_RIGHT)? 1.0f : 0.0f;
+			currInputs[XboxInputDpadUp]              = (buttons & XINPUT_GAMEPAD_DPAD_UP)? 1.0f : 0.0f;
+			currInputs[XboxInputDpadDown]            = (buttons & XINPUT_GAMEPAD_DPAD_DOWN)? 1.0f : 0.0f;
+			currInputs[XboxInputLeftBumper]          = (buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)? 1.0f : 0.0f;
+			currInputs[XboxInputRightBumper]         = (buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)? 1.0f : 0.0f;
+			currInputs[XboxInputLeftStickButton]     = (buttons & XINPUT_GAMEPAD_LEFT_THUMB)? 1.0f : 0.0f;
+			currInputs[XboxInputRightStickButton]    = (buttons & XINPUT_GAMEPAD_RIGHT_THUMB)? 1.0f : 0.0f;
+			currInputs[XboxInputBack]                = (buttons & XINPUT_GAMEPAD_BACK)? 1.0f : 0.0f;
+			currInputs[XboxInputStart]               = (buttons & XINPUT_GAMEPAD_START)? 1.0f : 0.0f;
+			currInputs[XboxInputLeftTrigger]         = gamepad->bLeftTrigger  / 255.0f;
+			currInputs[XboxInputRightTrigger]        = gamepad->bRightTrigger / 255.0f;
+			currInputs[XboxInputLeftStickLeft]       = max(-gamepad->sThumbLX, 0);
+			currInputs[XboxInputLeftStickRight]      = max( gamepad->sThumbLX, 0);
+			currInputs[XboxInputLeftStickUp]         = max( gamepad->sThumbLY, 0);
+			currInputs[XboxInputLeftStickDown]       = max(-gamepad->sThumbLY, 0);
+			currInputs[XboxInputRightStickLeft]      = max(-gamepad->sThumbRX, 0);
+			currInputs[XboxInputRightStickRight]     = max( gamepad->sThumbRX, 0);
+			currInputs[XboxInputRightStickUp]        = max( gamepad->sThumbRY, 0);
+			currInputs[XboxInputRightStickDown]      = max(-gamepad->sThumbRY, 0);
 
 			XINPUT_VIBRATION vibration;
 			vibration.wLeftMotorSpeed  = (WORD)(state->lightRumble*0xFFFF);
