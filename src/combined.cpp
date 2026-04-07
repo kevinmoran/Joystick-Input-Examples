@@ -676,11 +676,11 @@ void updateRawInput(Joysticks* joysticks, LPARAM lParam)
 	{
 		RID_DEVICE_INFO deviceInfo;
 		UINT deviceInfoSize = sizeof(deviceInfo);
-		bool gotInfo = GetRawInputDeviceInfo(input->header.hDevice, RIDI_DEVICEINFO, &deviceInfo, &deviceInfoSize) > 0;
+		bool gotInfo = GetRawInputDeviceInfoW(input->header.hDevice, RIDI_DEVICEINFO, &deviceInfo, &deviceInfoSize) > 0;
 
-		GetRawInputDeviceInfo(input->header.hDevice, RIDI_PREPARSEDDATA, 0, &size);
+		GetRawInputDeviceInfoW(input->header.hDevice, RIDI_PREPARSEDDATA, 0, &size);
 		_HIDP_PREPARSED_DATA* data = (_HIDP_PREPARSED_DATA*)malloc(size);
-		bool gotPreparsedData = GetRawInputDeviceInfo(input->header.hDevice, RIDI_PREPARSEDDATA, data, &size) > 0;
+		bool gotPreparsedData = GetRawInputDeviceInfoW(input->header.hDevice, RIDI_PREPARSEDDATA, data, &size) > 0;
 
 		if (gotInfo && gotPreparsedData)
 		{
@@ -772,7 +772,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 	if (msg == WM_INPUT_DEVICE_CHANGE) {
 		updateConnectionStatus(joysticks, (HANDLE)lParam, wParam);
 	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
 
 Joysticks createJoysticks()
@@ -780,12 +780,12 @@ Joysticks createJoysticks()
 	Joysticks joysticks = {0};
 
 	// Create a window, as we need a window procedure to receive raw input events
-	WNDCLASSA wnd = { 0 };
+	WNDCLASSW wnd = { 0 };
 	wnd.hInstance = GetModuleHandle(0);
 	wnd.lpfnWndProc = WindowProcedure;
-	wnd.lpszClassName = "RawInputEventWindow";
-	RegisterClassA(&wnd);
-	joysticks.hwnd = CreateWindowA(wnd.lpszClassName, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, wnd.hInstance, 0);
+	wnd.lpszClassName = L"RawInputEventWindow";
+	RegisterClassW(&wnd);
+	joysticks.hwnd = CreateWindowW(wnd.lpszClassName, 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, wnd.hInstance, 0);
 
 	// Register devices
 	RAWINPUTDEVICE deviceList[2];
@@ -814,9 +814,9 @@ void updateJoysticks(Joysticks* joysticks)
 	// HID controllers
 	SetPropA(joysticks->hwnd, "userData", joysticks);
 	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		DispatchMessageW(&msg);
 	}
 
 	// Xbox controllers
