@@ -854,14 +854,14 @@ void updateJoysticks(Joysticks* joysticks)
 			currInputs[XboxInputStart]               = (buttons & XINPUT_GAMEPAD_START)? 1.0f : 0.0f;
 			currInputs[XboxInputLeftTrigger]         = gamepad->bLeftTrigger  / 255.0f;
 			currInputs[XboxInputRightTrigger]        = gamepad->bRightTrigger / 255.0f;
-			currInputs[XboxInputLeftStickLeft]       = max(-gamepad->sThumbLX, 0);
-			currInputs[XboxInputLeftStickRight]      = max( gamepad->sThumbLX, 0);
-			currInputs[XboxInputLeftStickUp]         = max( gamepad->sThumbLY, 0);
-			currInputs[XboxInputLeftStickDown]       = max(-gamepad->sThumbLY, 0);
-			currInputs[XboxInputRightStickLeft]      = max(-gamepad->sThumbRX, 0);
-			currInputs[XboxInputRightStickRight]     = max( gamepad->sThumbRX, 0);
-			currInputs[XboxInputRightStickUp]        = max( gamepad->sThumbRY, 0);
-			currInputs[XboxInputRightStickDown]      = max(-gamepad->sThumbRY, 0);
+			currInputs[XboxInputLeftStickLeft]       = max(-gamepad->sThumbLX / 32767.0f, 0);
+			currInputs[XboxInputLeftStickRight]      = max( gamepad->sThumbLX / 32767.0f, 0);
+			currInputs[XboxInputLeftStickUp]         = max( gamepad->sThumbLY / 32767.0f, 0);
+			currInputs[XboxInputLeftStickDown]       = max(-gamepad->sThumbLY / 32767.0f, 0);
+			currInputs[XboxInputRightStickLeft]      = max(-gamepad->sThumbRX / 32767.0f, 0);
+			currInputs[XboxInputRightStickRight]     = max( gamepad->sThumbRX / 32767.0f, 0);
+			currInputs[XboxInputRightStickUp]        = max( gamepad->sThumbRY / 32767.0f, 0);
+			currInputs[XboxInputRightStickDown]      = max(-gamepad->sThumbRY / 32767.0f, 0);
 
 			XINPUT_VIBRATION vibration;
 			vibration.wLeftMotorSpeed  = (WORD)(state->lightRumble*0xFFFF);
