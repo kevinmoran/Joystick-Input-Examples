@@ -687,9 +687,9 @@ void updateRawInput(Joysticks* joysticks, LPARAM lParam)
 		{
 			for (UINT i=Joysticks::maxXinputControllers; i<joysticks->count; ++i)
 			{
-				if (input->header.hDevice == joysticks->states[i].deviceHandle)
+				JoystickState* state = &joysticks->states[i];
+				if (input->header.hDevice == state->deviceHandle)
 				{
-					JoystickState* state = &joysticks->states[i];
 					if (isDualshock4(deviceInfo.hid)) {
 						updateDualshock4(state, input->data.hid.bRawData, input->data.hid.dwSizeHid);
 					}
@@ -738,9 +738,9 @@ void disconnectHIDJoystick(Joysticks* joysticks, HANDLE deviceHandle)
 {
 	for (uint32_t i=Joysticks::maxXinputControllers; i<joysticks->count; ++i)
 	{
-		if (deviceHandle == joysticks->states[i].deviceHandle && !isXboxController(joysticks->states[i].deviceName))
+		JoystickState* state = &joysticks->states[i];
+		if (deviceHandle == state->deviceHandle && !isXboxController(state->deviceName))
 		{
-			JoystickState* state = &joysticks->states[i];
 			state->connected = false;
 			if (state->outputFile != INVALID_HANDLE_VALUE)
 			{
