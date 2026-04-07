@@ -869,9 +869,9 @@ void updateJoysticks(Joysticks* joysticks)
 	}
 }
 
-const char* getInputName(Joysticks joysticks, unsigned int joystickIndex, unsigned int inputIndex)
+const char* getInputName(JoystickType type, unsigned int inputIndex)
 {
-	switch (joysticks.states[joystickIndex].type)
+	switch (type)
 	{
 		case JoystickTypeGeneric: return genericInputNames[inputIndex];
 		case JoystickTypeDualshock4: return ps4InputNames[inputIndex];
@@ -894,7 +894,7 @@ int main()
 			{
 				if (state->currentInputs[inputIndex] > 0.5 && state->previousInputs[inputIndex] <= 0.5f)
 				{
-					const char* inputName = getInputName(joysticks, joystickIndex, inputIndex);
+					const char* inputName = getInputName(state->type, inputIndex);
 					if (joystickIndex >= 0 && joystickIndex <= 3) {
 						printf("XBox controller %d: ", joystickIndex);
 					}
