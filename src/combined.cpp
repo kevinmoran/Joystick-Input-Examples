@@ -664,6 +664,7 @@ void parseGenericController(JoystickState* out, BYTE rawData[], DWORD dataSize, 
 		}
 		free(usages);
 	}
+	free(buttonCaps);
 	out->type = JoystickTypeGeneric;
 }
 
