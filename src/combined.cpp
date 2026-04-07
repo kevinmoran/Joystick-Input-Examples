@@ -903,85 +903,86 @@ int main()
 					}
 					printf("%s\n", inputName);
 				}
-
-				float rumbleLeft = 0;
-				float rumbleRight = 0;
-				if (state->type == JoystickTypeXbox) {
-					state->lightRumble = state->currentInputs[XboxInputLeftTrigger];
-					state->heavyRumble = state->currentInputs[XboxInputRightTrigger];
-				}
-				else if (state->type == JoystickTypeDualshock4) {
-					state->heavyRumble = state->currentInputs[DS4InputL2];
-					state->lightRumble = state->currentInputs[DS4InputR2];
-					state->ledRed = (state->currentInputs[DS4InputCircle] || state->currentInputs[DS4InputSquare])? 1.0f : 0.0f;
-					state->ledGreen = state->currentInputs[DS4InputTriangle];
-					state->ledBlue = (state->currentInputs[DS4InputX] || state->currentInputs[DS4InputSquare])? 1.0f : 0.0f;
-				}
-				else if (state->type == JoystickTypeDualsense) {
-					state->heavyRumble = state->currentInputs[DS5InputLeftStickUp] + state->currentInputs[DS5InputLeftStickDown];
-					state->lightRumble = state->currentInputs[DS5InputLeftStickLeft] + state->currentInputs[DS5InputLeftStickRight];
-					state->ledRed = (state->currentInputs[DS5InputCircle] || state->currentInputs[DS5InputSquare]) ? 1.0f : 0.0f;
-					state->ledGreen = state->currentInputs[DS5InputTriangle];
-					state->ledBlue = (state->currentInputs[DS5InputX] || state->currentInputs[DS5InputSquare]) ? 1.0f : 0.0f;
-
-					if (state->currentInputs[DS5InputSquare] > 0.5f) {
-						state->rightTriggerEffect = {
-							.type = TriggerEffect::type_resistance,
-							.resistance = {
-								.zoneStrengths = {0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 1.0f}
-							}
-						};
-					}
-					else if (state->currentInputs[DS5InputTriangle] > 0.5f) {
-						state->rightTriggerEffect.type = TriggerEffect::type_weapon;
-						state->rightTriggerEffect.weapon.startPosition = 0.2f;
-						state->rightTriggerEffect.weapon.endPosition   = 0.4f;
-						state->rightTriggerEffect.weapon.strength = 0.8f;
-					}
-					else if (state->currentInputs[DS5InputCircle] > 0.5f) {
-						state->rightTriggerEffect = {
-							.type = TriggerEffect::type_vibration,
-							.vibration = {
-								.zoneStrengths = {0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 1.0f},
-								.frequency = 0.3f
-							}
-						};
-					}
-					else {
-						state->rightTriggerEffect.type = TriggerEffect::type_none;
-					}
-
-					if (state->currentInputs[DS5InputDpadLeft] > 0.5f) {
-						state->leftTriggerEffect = {
-							.type = TriggerEffect::type_resistance,
-							.resistance = {
-								.zoneStrengths = {1.0f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.0f}
-							}
-						};
-					}
-					else if (state->currentInputs[DS5InputDpadUp] > 0.5f) {
-						state->leftTriggerEffect.type = TriggerEffect::type_weapon;
-						state->leftTriggerEffect.weapon.startPosition = 0.7f;
-						state->leftTriggerEffect.weapon.endPosition   = 0.9f;
-						state->leftTriggerEffect.weapon.strength = 0.2f;
-					}
-					else if (state->currentInputs[DS5InputDpadRight] > 0.5f) {
-						state->leftTriggerEffect = {
-							.type = TriggerEffect::type_vibration,
-							.vibration = {
-								.zoneStrengths = {1.0f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.0f},
-								.frequency = 0.8f
-							}
-						};
-					}
-					else {
-						state->leftTriggerEffect.type = TriggerEffect::type_none;
-					}
-				}
-
-				if (state->lightRumble < 0.1) state->lightRumble = 0;
-				if (state->heavyRumble < 0.1) state->heavyRumble = 0;
 			}
+
+			float rumbleLeft = 0;
+			float rumbleRight = 0;
+			if (state->type == JoystickTypeXbox) {
+				state->lightRumble = state->currentInputs[XboxInputLeftTrigger];
+				state->heavyRumble = state->currentInputs[XboxInputRightTrigger];
+			}
+			else if (state->type == JoystickTypeDualshock4) {
+				state->heavyRumble = state->currentInputs[DS4InputL2];
+				state->lightRumble = state->currentInputs[DS4InputR2];
+				state->ledRed = (state->currentInputs[DS4InputCircle] || state->currentInputs[DS4InputSquare])? 1.0f : 0.0f;
+				state->ledGreen = state->currentInputs[DS4InputTriangle];
+				state->ledBlue = (state->currentInputs[DS4InputX] || state->currentInputs[DS4InputSquare])? 1.0f : 0.0f;
+			}
+			else if (state->type == JoystickTypeDualsense) {
+				state->heavyRumble = state->currentInputs[DS5InputLeftStickUp] + state->currentInputs[DS5InputLeftStickDown];
+				state->lightRumble = state->currentInputs[DS5InputLeftStickLeft] + state->currentInputs[DS5InputLeftStickRight];
+				state->ledRed = (state->currentInputs[DS5InputCircle] || state->currentInputs[DS5InputSquare]) ? 1.0f : 0.0f;
+				state->ledGreen = state->currentInputs[DS5InputTriangle];
+				state->ledBlue = (state->currentInputs[DS5InputX] || state->currentInputs[DS5InputSquare]) ? 1.0f : 0.0f;
+
+				if (state->currentInputs[DS5InputSquare] > 0.5f) {
+					state->rightTriggerEffect = {
+						.type = TriggerEffect::type_resistance,
+						.resistance = {
+							.zoneStrengths = {0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 1.0f}
+						}
+					};
+				}
+				else if (state->currentInputs[DS5InputTriangle] > 0.5f) {
+					state->rightTriggerEffect.type = TriggerEffect::type_weapon;
+					state->rightTriggerEffect.weapon.startPosition = 0.2f;
+					state->rightTriggerEffect.weapon.endPosition   = 0.4f;
+					state->rightTriggerEffect.weapon.strength = 0.8f;
+				}
+				else if (state->currentInputs[DS5InputCircle] > 0.5f) {
+					state->rightTriggerEffect = {
+						.type = TriggerEffect::type_vibration,
+						.vibration = {
+							.zoneStrengths = {0.0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 1.0f},
+							.frequency = 0.3f
+						}
+					};
+				}
+				else {
+					state->rightTriggerEffect.type = TriggerEffect::type_none;
+				}
+
+				if (state->currentInputs[DS5InputDpadLeft] > 0.5f) {
+					state->leftTriggerEffect = {
+						.type = TriggerEffect::type_resistance,
+						.resistance = {
+							.zoneStrengths = {1.0f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.0f}
+						}
+					};
+				}
+				else if (state->currentInputs[DS5InputDpadUp] > 0.5f) {
+					state->leftTriggerEffect.type = TriggerEffect::type_weapon;
+					state->leftTriggerEffect.weapon.startPosition = 0.7f;
+					state->leftTriggerEffect.weapon.endPosition   = 0.9f;
+					state->leftTriggerEffect.weapon.strength = 0.2f;
+				}
+				else if (state->currentInputs[DS5InputDpadRight] > 0.5f) {
+					state->leftTriggerEffect = {
+						.type = TriggerEffect::type_vibration,
+						.vibration = {
+							.zoneStrengths = {1.0f, 0.8f, 0.7f, 0.6f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.0f},
+							.frequency = 0.8f
+						}
+					};
+				}
+				else {
+					state->leftTriggerEffect.type = TriggerEffect::type_none;
+				}
+			}
+
+			if (state->lightRumble < 0.1) state->lightRumble = 0;
+			if (state->heavyRumble < 0.1) state->heavyRumble = 0;
+			
 		}
 		Sleep(16);
 	}
