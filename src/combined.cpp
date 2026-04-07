@@ -905,8 +905,6 @@ int main()
 				}
 			}
 
-			float rumbleLeft = 0;
-			float rumbleRight = 0;
 			if (state->type == JoystickTypeXbox) {
 				state->lightRumble = state->currentInputs[XboxInputLeftTrigger];
 				state->heavyRumble = state->currentInputs[XboxInputRightTrigger];
