@@ -667,12 +667,12 @@ void parseGenericController(JoystickState* out, BYTE rawData[], DWORD dataSize, 
 	out->type = JoystickTypeGeneric;
 }
 
-void updateRawInput(Joysticks* joysticks, LPARAM lParam)
+void updateRawInput(Joysticks* joysticks, HRAWINPUT hRawInput)
 {
 	UINT size = 0;
-	GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+	GetRawInputData(hRawInput, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
 	RAWINPUT* input = (RAWINPUT*)malloc(size);
-	if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, input, &size, sizeof(RAWINPUTHEADER)) > 0)
+	if (GetRawInputData(hRawInput, RID_INPUT, input, &size, sizeof(RAWINPUTHEADER)) > 0)
 	{
 		RID_DEVICE_INFO deviceInfo;
 		UINT deviceInfoSize = sizeof(deviceInfo);
@@ -767,7 +767,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 {
 	Joysticks* joysticks = (Joysticks*)GetPropA(hwnd, "userData");
 	if (msg == WM_INPUT) {
-		updateRawInput(joysticks, lParam);
+		updateRawInput(joysticks, (HRAWINPUT)lParam);
 	}
 	if (msg == WM_INPUT_DEVICE_CHANGE) {
 		updateConnectionStatus(joysticks, (HANDLE)lParam, wParam);

@@ -143,12 +143,12 @@ bool isDualshock4(RID_DEVICE_INFO_HID info)
 	return info.dwVendorId == sonyVendorID && (info.dwProductId == ds4Gen1ProductID || info.dwProductId == ds4Gen2ProductID);
 }
 
-void updateRawInput(LPARAM lParam, OutputData* outputData)
+void updateRawInput(HRAWINPUT hRawInput, OutputData* outputData)
 {
 	UINT size = 0;
-	GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+	GetRawInputData(hRawInput, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
 	RAWINPUT* input = (RAWINPUT*)malloc(size);
-	if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, input, &size, sizeof(RAWINPUTHEADER)) > 0)
+	if (GetRawInputData(hRawInput, RID_INPUT, input, &size, sizeof(RAWINPUTHEADER)) > 0)
 	{
 		RID_DEVICE_INFO deviceInfo;
 		UINT deviceInfoSize = sizeof(deviceInfo);
@@ -172,7 +172,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 {
 	OutputData* outputData = (OutputData*)GetPropA(hwnd, "userData");
 	if (msg == WM_INPUT) {
-		updateRawInput(lParam, outputData);
+		updateRawInput((HRAWINPUT)lParam, outputData);
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }

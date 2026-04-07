@@ -4,12 +4,12 @@
 #include <hidsdi.h>
 #include <hidpi.h>
 
-void printRawInputData(LPARAM lParam)
+void printRawInputData(HRAWINPUT hRawInput)
 {
 	UINT size = 0;
-	GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+	GetRawInputData(hRawInput, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
 	RAWINPUT* input = (RAWINPUT*)malloc(size);
-	bool gotInput = GetRawInputData((HRAWINPUT)lParam, RID_INPUT, input, &size, sizeof(RAWINPUTHEADER)) > 0;
+	bool gotInput = GetRawInputData(hRawInput, RID_INPUT, input, &size, sizeof(RAWINPUTHEADER)) > 0;
 	if (gotInput)
 	{
 		GetRawInputDeviceInfo(input->header.hDevice, RIDI_PREPARSEDDATA, 0, &size);
@@ -55,7 +55,7 @@ void printRawInputData(LPARAM lParam)
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (msg == WM_INPUT) {
-		printRawInputData(lParam);
+		printRawInputData((HRAWINPUT)lParam);
 		return 0;
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
