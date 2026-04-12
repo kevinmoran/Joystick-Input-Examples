@@ -632,16 +632,16 @@ void parseGenericController(JoystickState* out, BYTE rawData[], DWORD dataSize, 
 	for (unsigned int i = 0; i < caps.NumberInputValueCaps; ++i)
 	{
 		ULONG value;
-		NTSTATUS status = HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, 0, valueCaps[i].Range.UsageMin, &value, preparsedData, (PCHAR)rawData, dataSize);
+		NTSTATUS status = HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, 0, valueCaps[i].NotRange.Usage, &value, preparsedData, (PCHAR)rawData, dataSize);
 		float maxValue = (float)(1<<(valueCaps[i].BitSize))-1;
 		float normalizedValue = (value / maxValue)*2-1;
 		unsigned int usage = valueCaps[i].Range.UsageMin;
-		if (usage >= 0x30 && usage <= 0x37) {
-			int axisIndex = usage-0x30;
+		if (usage >= HID_USAGE_GENERIC_X && usage <= HID_USAGE_GENERIC_DIAL) {
+			int axisIndex = usage-HID_USAGE_GENERIC_X;
 			out->currentInputs[GenericInputAxis0Positive+2*axisIndex] = normalizedValue;
 			out->currentInputs[GenericInputAxis0Negative+2*axisIndex] = -normalizedValue;
 		}
-		if (usage == 0x39) {
+		if (usage == HID_USAGE_GENERIC_HATSWITCH) {
 			LONG hat = value - valueCaps[i].LogicalMin;
 			out->currentInputs[GenericInputHatUp]    = (hat==0 || hat==1 || hat==7)? 1.0f : 0.1f; 
 			out->currentInputs[GenericInputHatRight] = (hat==1 || hat==2 || hat==3)? 1.0f : 0.1f;  
@@ -655,7 +655,7 @@ void parseGenericController(JoystickState* out, BYTE rawData[], DWORD dataSize, 
 	HidP_GetButtonCaps(HidP_Input, buttonCaps, &caps.NumberInputButtonCaps, preparsedData);
 	for (unsigned int i = 0; i < caps.NumberInputButtonCaps; ++i)
 	{
-		unsigned int buttonCount = buttonCaps->Range.UsageMax - buttonCaps->Range.UsageMin + 1;
+		unsigned int buttonCount = buttonCaps[i].Range.UsageMax - buttonCaps[i].Range.UsageMin + 1;
 		USAGE* usages = (USAGE*)malloc(sizeof(USAGE) * buttonCount);
 		HidP_GetUsages(HidP_Input, buttonCaps[i].UsagePage, 0, usages, (PULONG)&buttonCount, preparsedData, (PCHAR)rawData, dataSize);
 		for (unsigned int usagesIndex=0; usagesIndex < buttonCount; ++usagesIndex) {
