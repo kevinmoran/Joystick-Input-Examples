@@ -641,7 +641,7 @@ void parseGenericController(JoystickState* out, BYTE rawData[], DWORD dataSize, 
 			out->currentInputs[GenericInputAxis0Positive+2*axisIndex] = normalizedValue;
 			out->currentInputs[GenericInputAxis0Negative+2*axisIndex] = -normalizedValue;
 		}
-		if (usage == HID_USAGE_GENERIC_HATSWITCH) {
+		else if (usage == HID_USAGE_GENERIC_HATSWITCH) {
 			LONG hat = value - valueCaps[i].LogicalMin;
 			out->currentInputs[GenericInputHatUp]    = (hat==0 || hat==1 || hat==7)? 1.0f : 0.1f; 
 			out->currentInputs[GenericInputHatRight] = (hat==1 || hat==2 || hat==3)? 1.0f : 0.1f;  
